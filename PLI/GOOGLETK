@@ -1,0 +1,12 @@
+ GOOGLE: PROC OPTIONS(MAIN);
+    DCL STR CHARACTER (20);
+    DCL COUNT FIXED BINARY(31) INIT(0);
+    DCL I FIXED BINARY(31) INIT(0);
+    DCL J FIXED BINARY(31) INIT (0);
+    DCL TEMPS CHARACTER(1);
+    STR = 'aaaaeeeeewwwwwtsasss';
+    DO J=1 to 20;
+      I = TALLY(STR,substr(str,j,1));
+      PUT SKIP LIST(substr(str,j,1),I);
+    END;
+ END;

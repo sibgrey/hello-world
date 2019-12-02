@@ -1,0 +1,6 @@
+ TASK1: PROC OPTIONs(MAIN);
+     if('Aaaaaa'>'aZZZZ') then
+         put skip list('1');
+                 else
+         put skip list('2');
+ END;

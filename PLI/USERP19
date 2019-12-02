@@ -1,0 +1,59 @@
+* PROCESS SYSTEM(IMS);
+ USERP07: PROC(IOPCBP,ALTPCB1,ALTPCB2,MSGPCB)
+          OPTIONS(MAIN) REORDER;
+
+ DCL  IOPCBP     PTR;
+ DCL  ALTPCB1    PTR;
+ DCL  ALTPCB2    PTR;
+ DCL  MSGPCB     PTR;
+ DCL  PLITDLI    ENTRY EXT;
+
+ DCL 01 INMSG,
+     02 INLL       FIXED BIN (31) INIT(45),
+     02 INZZ       FIXED BIN (15),
+     02 INTRCD     CHAR (10),
+     02 INCMD      CHAR (08),
+     02 INNAME1    CHAR (10),
+     02 INNAME2    CHAR (10),
+     02 INEXTN     CHAR (10),
+     02 INZIP      CHAR (07);
+
+ DCL STR CHAR(25);
+ DCL 01  OUTMSG,
+     02  OUTLL      FIXED BIN (31) INIT(93),
+     02  OUTZZ      FIXED BIN (15) INIT(0),
+     02  OUTMESS    CHAR (40)      INIT(' '),
+     02  OUTCMD     CHAR (08)      INIT (' '),
+     02  OUTNAME1   CHAR (10)      INIT (' '),
+     02  OUTNAME2   CHAR (10)      INIT (' '),
+     02  OUTEXTN    CHAR (10)      INIT (' '),
+     02  OUTZIP     CHAR (07)      INIT (' '),
+     02  OUTSEGNO   CHAR (04)      INIT (' ');
+
+ DCL 1 IOPCB BASED(IOPCBP),
+      3 LTERM    CHAR(   8),
+      3 RES      CHAR(   2),
+      3 STATIO   CHAR(   2) INIT('  '),
+      3 IMSMESS  FIXED DEC(7),
+      3 TIMEMSG  FIXED DEC(7),
+      3 NOMSG    FIXED BIN(31,0),
+      3 MOD      CHAR(8),
+      3 USER     CHAR(8);
+
+ DCL THREE                FIXED BIN(31) INIT(3);
+ DCL GU    CHAR(4) INIT('GU  ');
+ DCL ISRT  CHAR(4) INIT('ISRT');
+
+      /*           PROGRAM START             */
+
+
+ CALL PLITDLI (THREE,GU,IOPCBP,INMSG);
+ PUT SKIP EDIT('(USER_19) IMS READ  STATUS: *',IOPCB.STATIO,'*')(A);
+ PUT SKIP DATA(INMSG);
+
+ OUTMSG.OUTMESS = INMSG.INNAME1|| ', HELLO';
+
+ CALL PLITDLI (THREE,ISRT,IOPCBP,OUTMSG);
+ PUT SKIP EDIT('(USER_19) IMS WRITE STATUS: *',IOPCB.STATIO,'*')(A);
+
+ END;

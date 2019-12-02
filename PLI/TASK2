@@ -1,0 +1,13 @@
+ HELLO: PROC OPTIONs(MAIN);
+    dcl INPFILE file record input;
+    DCL REC_INP CHAR(80) INIT('');
+    DCL EOF BIT(1) INIT('0'B);
+    ON ENDFILE(INPFILE)
+       EOF = '1'B;
+    OPEN FILE(INPFILE);
+    READ FILE (INPFILE) INTO (REC_INP);
+    DO WHILE(^EOF);
+      PUT SKIP LIST(REC_INP);
+      READ FILE (INPFILE) INTO (REC_INP);
+    END;
+ END;

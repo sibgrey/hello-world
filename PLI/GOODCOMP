@@ -1,0 +1,76 @@
+ NEWTASK: PROC OPTIONS(MAIN);
+
+    DCL STR CHAR(80) INIT('');
+    DCL TEMP CHAR(80) INIT('');
+
+    DCL COUNTER REAL FIXED DECIMAL(5) INIT(0);
+
+    DCL INPFILE1 FILE RECORD INPUT;
+    DCL INPFILE2 FILE RECORD INPUT;
+    DCL OUTFILE  FILE RECORD OUTPUT;
+
+    DCL 1 REC_INP1,
+        2 NAME    CHAR(10),
+        2 SURNAME CHAR(20),
+        2 FILL    CHAR(994);
+
+    DCL 1 REC_INP2,
+        2 NAME    CHAR(10),
+        2 SURNAME CHAR(20),
+        2 FILL    CHAR(994);
+
+    DCL EOF1 BIT(1) INIT('0'B);
+    DCL EOF2 BIT(1) INIT('0'B);
+
+    ON ENDFILE(INPFILE1)
+        EOF1='1'B;
+    ON ENDFILE(INPFILE2)
+        EOF2='1'B;
+    OPEN FILE(INPFILE1);
+    OPEN FILE(INPFILE2);
+    OPEN FILE(OUTFILE);
+    READ FILE(INPFILE1) INTO (REC_INP1);
+    READ FILE(INPFILE2) INTO (REC_INP2);
+
+    DO WHILE(^EOF1);
+        DO WHILE(^EOF2);
+            IF(REC_INP1.NAME=REC_INP2.NAME) THEN BEGIN;
+                IF(REC_INP1.SURNAME^=REC_INP2.SURNAME) THEN BEGIN;
+                    STR = REC_INP1.NAME||' '||REC_INP1.SURNAME||' U';
+                    END;
+                    IF (STR^=REPEAT(' ',80) & STR^=TEMP) THEN BEGIN;
+                        WRITE FILE(OUTFILE) FROM (STR);
+                        TEMP=STR;
+                        END;
+                READ FILE (INPFILE1) INTO (REC_INP1);
+                READ FILE (INPFILE2) INTO (REC_INP2);
+                END;
+
+            IF(REC_INP1.NAME>REC_INP2.NAME) THEN BEGIN;
+
+                STR = REC_INP2.NAME||' '||REC_INP2.SURNAME||' I';
+                IF (STR^=REPEAT(' ',80) & STR^=TEMP) THEN BEGIN;
+                    WRITE FILE(OUTFILE) FROM (STR);
+                    TEMP = STR;
+                    END;
+                READ FILE(INPFILE2) INTO (REC_INP2);
+                END;
+
+            IF(REC_INP1.NAME<REC_INP2.NAME) THEN BEGIN;
+
+                STR = REC_INP1.NAME||' '||REC_INP1.SURNAME||' D';
+                IF (STR^=REPEAT(' ',80) & STR^=TEMP) THEN BEGIN;
+                    WRITE FILE(OUTFILE) FROM (STR);
+                    TEMP=STR;
+                    END;
+                READ FILE(INPFILE1) INTO (REC_INP1);
+                END;
+
+    PUT SKIP LIST ('1:',EOF1);
+    PUT SKIP LIST ('2:', EOF2);
+        END;
+    END;
+    CLOSE FILE(INPFILE1);
+    CLOSE FILE(INPFILE2);
+    CLOSE FILE(OUTFILE);
+ END;
